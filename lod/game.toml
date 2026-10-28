@@ -1,0 +1,91 @@
+# Autofilled by tools/new_project_layout/probe_disc.py from your legal dump.
+# Review before shipping. Runtime quirks / overlay seeds still need hand work.
+
+[game]
+name = "Legend of Dragoon, The (USA, Canada) (Disc 1)"
+id = "SCUS-94491"
+players = 1
+exe = "disc/SCUS_944.91"
+# Verified as one program on N images (verify_disc_set.py).
+# Disc 1 boots; the rest are data. The runtime builds its disc
+# roster from this list and mounts the SELECTED one (remembered
+# in disc_index), so the launcher can switch discs between runs.
+# Swapping mid-session is MULTI_DISC.md P3 and is not implemented.
+discs = [
+    "disc/Legend of Dragoon, The (USA, Canada) (Disc 1).cue",
+    "disc/Legend of Dragoon, The (USA, Canada) (Disc 2).cue",
+    "disc/Legend of Dragoon, The (USA, Canada) (Disc 3).cue",
+    "disc/Legend of Dragoon, The (USA, Canada) (Disc 4).cue",
+]
+load_address = "0x80188888"
+entry_pc = "0x801BF4E8"
+text_size = "0x0003E000"
+stack_base = "0x801FFFF0"
+
+# Digests are for data Track 01 (first BINARY FILE / TRACK 01).
+[prepare_disc]
+out_dir = "disc"
+bin_name = "Legend of Dragoon, The (USA, Canada) (Disc 1).bin"
+cue_name = "Legend of Dragoon, The (USA, Canada) (Disc 1).cue"
+boot_exe = "SCUS_944.91"
+known_sizes = [484951824]
+known_md5 = [
+  "acf7717e2192c78d8c5859cfacfc384d",
+]
+known_sha1 = [
+  "8dfe525bd348531ac69f0a025e04ce08b8f6079f",
+]
+known_crc32 = [
+  "24cb8f5c",
+]
+
+[recompiler]
+seeds = "seeds/ghidra_funcs.txt"
+out_dir = "generated"
+strict = true
+
+[runtime]
+window_title = "Legend of Dragoon, The (USA, Canada) (Disc 1) Recompiled"
+memcard_dir = "saves"
+overlay_cache = true
+
+[video]
+renderer = "opengl"
+aspect_ratio = "4:3"
+
+[controller]
+default_mode = "digital"
+
+# Online mount gate: digests + track count + optional TOC fingerprint
+# (see docs/NETPLAY.md).
+[netplay]
+require_cue = true
+required_tracks = 1
+required_disc_fp = "64ba917b5cbbc081bce33e9f9bb5afd0c3251cdcc131bb875ff85144ea4c69af"
+
+# Widescreen (PS5: ps5_controls.ini widescreen = on). The engine state word
+# (Severed Chains: engineState_8004dd20) picks the scenes that widen:
+# 5 = field/town, 6 = battle, 8 = world map. Fields widen by sliding the view
+# inside the room's pre-rendered art (view_anchor below); rooms narrower than
+# the screen get side bars. FMVs and menus stay 4:3.
+[widescreen]
+# Black side margins when no 3D is drawn (battle-entry melt, menus).
+blank_margins_without_3d = true
+# Movies show only what the movie decoder wrote (no leftover-VRAM junk).
+fmv_hide_unwritten = true
+gameplay_state_addr = "0x8004DD20"
+gameplay_state_values = ["0x5", "0x6", "0x8"]
+gte_game_mode = true
+[widescreen.view_anchor]
+# fields: the wide view slides inside the room (camera = screenOffset.x,
+# limits = the submap scroll clamp); narrow rooms get black side bars
+camera = "0x800CB568"
+min = "0x800CB574"
+max = "0x800CB570"
+negate = true
+states = ["0x5"]
+[widescreen.cull]
+# world map (0x800C9...) and field models (0x800DA...-0x800EE...):
+# screen X kept in [-192, 192] around the centre
+slti_sites = ["0x800C9540", "0x800C982C", "0x800C9B58", "0x800C9E8C", "0x800CA178", "0x800CA4B0", "0x800CA820", "0x800CA834", "0x800CA848", "0x800CA85C", "0x800CAB54", "0x800CAB68", "0x800CAB7C", "0x800DAD18", "0x800DAD2C", "0x800DAD40", "0x800DAD54", "0x800DAFFC", "0x800DB010", "0x800DB024", "0x800DB31C", "0x800DB330", "0x800DB344", "0x800DB358", "0x800DB648", "0x800DB65C", "0x800DB670", "0x800DB92C", "0x800DB940", "0x800DB954", "0x800DB968", "0x800DBC5C", "0x800DBC70", "0x800DBC84", "0x800DBFBC", "0x800DBFD0", "0x800DBFE4", "0x800DBFF8", "0x800DC2E0", "0x800DC2F4", "0x800DC308", "0x800DC61C", "0x800DC630", "0x800DC644", "0x800DC658", "0x800DC948", "0x800DC95C", "0x800DC970", "0x800DCC34", "0x800DCC48", "0x800DCC5C", "0x800DCC70", "0x800DCF68", "0x800DCF7C", "0x800DCF90", "0x800DD2A8", "0x800DD2BC", "0x800DD2D0", "0x800DD2E4", "0x800DD62C", "0x800DD640", "0x800DD654", "0x800DD9E4", "0x800DD9F8", "0x800DDA0C", "0x800DDA20", "0x800DDD14", "0x800DDD28", "0x800DDD3C", "0x800EE42C"]
+slti_lower_sites = ["0x800C94A0", "0x800C97B4", "0x800C9AB8", "0x800C9E14", "0x800CA0D8", "0x800CA438", "0x800CA780", "0x800CA794", "0x800CA7A8", "0x800CA7BC", "0x800CAADC", "0x800CAAF0", "0x800CAB04", "0x800CC1FC", "0x800CC210", "0x800CC224", "0x800CC238", "0x800DAC78", "0x800DAC8C", "0x800DACA0", "0x800DACB4", "0x800DAF84", "0x800DAF98", "0x800DAFAC", "0x800DB27C", "0x800DB290", "0x800DB2A4", "0x800DB2B8", "0x800DB5D0", "0x800DB5E4", "0x800DB5F8", "0x800DB88C", "0x800DB8A0", "0x800DB8B4", "0x800DB8C8", "0x800DBBE4", "0x800DBBF8", "0x800DBC0C", "0x800DBF1C", "0x800DBF30", "0x800DBF44", "0x800DBF58", "0x800DC268", "0x800DC27C", "0x800DC290", "0x800DC57C", "0x800DC590", "0x800DC5A4", "0x800DC5B8", "0x800DC8D0", "0x800DC8E4", "0x800DC8F8", "0x800DCB94", "0x800DCBA8", "0x800DCBBC", "0x800DCBD0", "0x800DCEF0", "0x800DCF04", "0x800DCF18", "0x800DD208", "0x800DD21C", "0x800DD230", "0x800DD244", "0x800DD5B4", "0x800DD5C8", "0x800DD5DC", "0x800DD944", "0x800DD958", "0x800DD96C", "0x800DD980", "0x800DDC9C", "0x800DDCB0", "0x800DDCC4", "0x800EE414"]
